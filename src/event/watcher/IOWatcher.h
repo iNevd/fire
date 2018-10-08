@@ -29,12 +29,11 @@ public:
     int get_fd() const;
 
 private:
-    struct ev_io _io;
+    int _fd = 0;
+    Event _events = NONE;
     io_cb_t _cb;
     void* _priv_data = nullptr;
-    Event _events = NONE;
-    int _fd = 0;
-
+    struct ev_io _io;
 };
 
 

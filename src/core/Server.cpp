@@ -4,7 +4,8 @@
 //
 
 #include <zconf.h>
-#include <utils/log.h>
+#include "utils/log.h"
+#include "utils/util.h"
 #include "Server.h"
 
 
@@ -72,6 +73,8 @@ int Server::notify(caf::atom_value && msg) {
 }
 
 void Server::notice_cb(int fd, int event) {
+    UNUSED(fd);
+    UNUSED(event);
     return;
 }
 

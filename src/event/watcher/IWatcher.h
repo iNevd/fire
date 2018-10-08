@@ -8,7 +8,7 @@
 
 #include "ev.h"
 
-using Event = unsigned long;
+using Event = int;
 static const Event EVENT_NONE = 0;
 
 class IWatcher {

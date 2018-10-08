@@ -4,11 +4,12 @@
 //
 
 #include <zconf.h>
-#include <utils/network.h>
-#include <utils/time.h>
 #include <iostream>
-#include "ServerWorker.h"
+#include "utils/network.h"
+#include "utils/time.h"
 #include "utils/log.h"
+#include "utils/util.h"
+#include "ServerWorker.h"
 
 ServerWorker::ServerWorker()
     : Server(false)
@@ -63,6 +64,7 @@ void ServerWorker::stop() {
 }
 
 void ServerWorker::notice_cb(int fd, int event) {
+    UNUSED(event);
     LOG_TRACE("notice callback (thread)");
     caf::atom_value msg;
     if (read(fd, &msg, sizeof(caf::atom_value)) != sizeof(caf::atom_value)) {
@@ -104,6 +106,7 @@ void ServerWorker::notice_cb_new_connection(int fd) {
     /* create io event and timeout for the connection */
     c->_tcp_io_watcher =  new IOWatcher(c->_fd, IOWatcher::READ,
             [](int fd, int event, void* priv_data) {
+                UNUSED(fd);
                 auto c = reinterpret_cast<Connection*>(priv_data);
                 auto worker = reinterpret_cast<decltype(this)>(c->_owner);
                 worker->conn_io_cb(c, event);
@@ -124,7 +127,7 @@ void ServerWorker::notice_cb_new_connection(int fd) {
 
     _eventLoop.start_watcher(c->_timer_watcher, 100 * 1000);
 
-    if(fd > _connections.size()) {
+    if(static_cast<unsigned int>(fd) > _connections.size()) {
         _connections.resize(_connections.size() * 2);
     }
     _connections[fd] = c;

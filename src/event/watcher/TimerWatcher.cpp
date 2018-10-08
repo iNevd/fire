@@ -4,6 +4,7 @@
 //
 
 #include "TimerWatcher.h"
+#include "utils/util.h"
 
 TimerWatcher::TimerWatcher(TimerWatcher::timer_cb_t cb, void* priv_data, bool repeat)
         : _cb(cb), _repeat(repeat), _priv_data(priv_data) {
@@ -11,6 +12,8 @@ TimerWatcher::TimerWatcher(TimerWatcher::timer_cb_t cb, void* priv_data, bool re
     // create timer
     ev_init(&_timer,
             [](struct ev_loop *loop, struct ev_timer *timer, int event) {
+                UNUSED(loop);
+                UNUSED(event);
                 auto watcher = reinterpret_cast<decltype(this)>(timer->data);
                 watcher->_cb(watcher->_priv_data);
             }
@@ -35,6 +38,7 @@ void TimerWatcher::start_event(struct ev_loop *loop, Event usec) {
 
 
 void TimerWatcher::stop_event(struct ev_loop *loop, Event unused) {
+    UNUSED(unused);
     ev_timer_stop(loop, &_timer);
 }
 

@@ -3,6 +3,8 @@ project(fire)
 
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_CXX_FLAGS "--pipe -W -Wextra -Wall -fPIC -finline-functions -Werror -g")
+
 set(SOURCE_FILES src/main.cpp)
 
 include_directories(src)
@@ -161,3 +163,4 @@ add_dependencies(${PROJECT_NAME} spdlog)
 target_link_libraries(${PROJECT_NAME} -lev)
 target_link_libraries(${PROJECT_NAME} -lzmalloc)
 target_link_libraries(${PROJECT_NAME} -lsds)
+target_link_libraries(${PROJECT_NAME} -lpthread)

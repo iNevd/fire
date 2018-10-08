@@ -5,7 +5,7 @@
 
 #include "log.h"
 
-auto _main_logger = spdlog::stdout_color_mt("main");
+std::shared_ptr<spdlog::logger> _main_logger = spdlog::stdout_color_mt("main");
 
 int init_log() {
     _main_logger->set_level(spdlog::level::trace);

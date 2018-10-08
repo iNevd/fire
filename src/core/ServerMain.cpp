@@ -3,9 +3,10 @@
 // Created by Nevd on 14/02/2018.
 //
 
-#include <utils/network.h>
 #include <zconf.h>
-#include <utils/log.h>
+#include "utils/network.h"
+#include "utils/log.h"
+#include "utils/util.h"
 #include "ServerMain.h"
 
 ServerMain::ServerMain()
@@ -37,7 +38,7 @@ int ServerMain::init() {
 
     LOG_TRACE("Create ServerWorkers");
     // create worker
-    for(int i=0; i<std::thread::hardware_concurrency(); i++) {
+    for(unsigned int i=0; i<std::thread::hardware_concurrency(); i++) {
         _workers.emplace_back(new ServerWorker());
     }
 
@@ -66,6 +67,7 @@ void ServerMain::stop() {
 }
 
 void ServerMain::notice_cb(int fd, int event) {
+    UNUSED(event);
     LOG_TRACE("notice callback");
     caf::atom_value msg;
     if (read(fd, &msg, sizeof(msg)) != sizeof(msg)) {
@@ -85,6 +87,7 @@ void ServerMain::notice_cb(int fd, int event) {
 }
 
 void ServerMain::tcp_conn_cb(int fd, int event) {
+    UNUSED(event);
     LOG_TRACE("tcp connection callback");
     auto cport = 0, cfd = 0;
     char cip[128] = {};
