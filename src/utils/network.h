@@ -12,11 +12,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-namespace network {
-    enum {
-        FAILED = -1,
-        SUCCESS
-    };
+namespace FIRE {
     int create_tcp_server(std::string host, int port);
     int tcp_accept(int s, char *ip, int *port);
     int generic_accept(int s, struct sockaddr *sa, socklen_t *len);

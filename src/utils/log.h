@@ -24,7 +24,6 @@ extern std::shared_ptr<spdlog::logger> _main_logger;
 #define LOG_ERROR(...) _main_logger->error(__VA_ARGS__)
 #define LOG_FATAL(...) _main_logger->critical(__VA_ARGS__)
 
-
 int init_log();
 
 #endif //FIRE_LOG_H

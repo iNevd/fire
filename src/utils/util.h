@@ -5,8 +5,10 @@
 #ifndef FIRE_UTIL_H
 #define FIRE_UTIL_H
 
-template <typename T>
-void UNUSED(T &&) {}
-
+namespace FIRE
+{
+    template <typename T>
+    void UNUSED(T &&) {}
+}
 
 #endif //FIRE_UTIL_H

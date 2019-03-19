@@ -8,17 +8,21 @@
 
 #include "ev.h"
 
-using Event = int;
-static const Event EVENT_NONE = 0;
+namespace FIRE
+{
+    using Event = int;
+    static const Event EVENT_NONE = 0;
 
-class IWatcher {
+    class IWatcher {
 
-public:
-    IWatcher() = default;
-    virtual ~IWatcher() = default;
+    public:
+        IWatcher() = default;
+        virtual ~IWatcher() = default;
 
-public:
-    virtual void start_event(struct ev_loop *, Event event = EVENT_NONE) = 0;
-    virtual void stop_event(struct ev_loop *, Event event = EVENT_NONE) = 0;
-};
+    public:
+        virtual void start_event(struct ev_loop *, Event event = EVENT_NONE) = 0;
+        virtual void stop_event(struct ev_loop *, Event event = EVENT_NONE) = 0;
+    };
+}
+
 #endif //FIRE_IWATCHER_H

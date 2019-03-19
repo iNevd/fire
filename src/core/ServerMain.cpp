@@ -8,7 +8,9 @@
 #include "utils/log.h"
 #include "utils/util.h"
 #include "ServerMain.h"
+#include "common/include.h"
 
+using namespace FIRE;
 ServerMain::ServerMain()
     : Server(false)
 {
@@ -21,16 +23,16 @@ int ServerMain::init() {
     Server::init();
 
     // listen
-    _listen_fd = network::create_tcp_server("127.0.0.1", 8888);
-    if(_listen_fd == network::FAILED) {
+    _listen_fd = FIRE::create_tcp_server("127.0.0.1", 8888);
+    if(_listen_fd == FAIL) {
         LOG_ERROR_DETAIL("listen failed, ip {}, port {}", "127.0.0.1", 8888);
-        return FAILED;
+        return FAIL;
     }
 
     // watch fd
     _tcp_conn_watcher = new IOWatcher(_listen_fd, IOWatcher::READ,
             [](int fd, int event, void* priv_data) {
-                auto server = reinterpret_cast<decltype(this)>(priv_data);
+                auto server = reinterpret_cast<ServerMain*>(priv_data);
                 server->tcp_conn_cb(fd, event);
             }
             , this);
@@ -92,8 +94,8 @@ void ServerMain::tcp_conn_cb(int fd, int event) {
     auto cport = 0, cfd = 0;
     char cip[128] = {};
 
-    cfd = network::tcp_accept(fd, cip, &cport);
-    if (cfd == network::FAILED) {
+    cfd = FIRE::tcp_accept(fd, cip, &cport);
+    if (cfd == FAIL) {
         LOG_WARN_DETAIL("tcp accept failed! error: {}", errno);
         return;
     }
@@ -105,12 +107,4 @@ void ServerMain::tcp_conn_cb(int fd, int event) {
         LOG_WARN_DETAIL("notify worker NewConnect failed!");
         return;
     }
-}
-
-ServerMain* ServerMain::_instance = nullptr;
-ServerMain &ServerMain::getInstance() {
-    if(ServerMain::_instance == nullptr) {
-        ServerMain::_instance = new ServerMain();
-    }
-    return *_instance;
 }

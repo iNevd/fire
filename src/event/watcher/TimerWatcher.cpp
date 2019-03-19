@@ -6,16 +6,17 @@
 #include "TimerWatcher.h"
 #include "utils/util.h"
 
-TimerWatcher::TimerWatcher(TimerWatcher::timer_cb_t cb, void* priv_data, bool repeat)
-        : _cb(cb), _repeat(repeat), _priv_data(priv_data) {
+using namespace FIRE;
+TimerWatcher::TimerWatcher(TimerWatcher::timer_cb_t cb, void* private_data, bool repeat)
+        : _cb(cb), _repeat(repeat), _private_data(private_data) {
     _timer.data = this;
     // create timer
     ev_init(&_timer,
             [](struct ev_loop *loop, struct ev_timer *timer, int event) {
                 UNUSED(loop);
                 UNUSED(event);
-                auto watcher = reinterpret_cast<decltype(this)>(timer->data);
-                watcher->_cb(watcher->_priv_data);
+                auto watcher = reinterpret_cast<TimerWatcher*>(timer->data);
+                watcher->_cb(watcher->_private_data);
             }
     );
 }

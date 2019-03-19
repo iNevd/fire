@@ -8,6 +8,7 @@
 #include "utils/util.h"
 #include "Server.h"
 
+using namespace FIRE;
 
 Server::Server(bool useDefaultEvLoop) : _eventLoop(useDefaultEvLoop, this) { }
 
@@ -17,13 +18,13 @@ int Server::init() {
     int fds[2] = {0};
     if (pipe(fds)) {
         LOG_ERROR_DETAIL("create pipe failed");
-        return FAILED;
+        return FAIL;
     }
     _notice_recv_fd = fds[0];
     _notice_send_fd = fds[1];
     _notify_watcher = new IOWatcher(_notice_recv_fd, IOWatcher::READ,
-                                     [](int fd, int event, void* priv_data) {
-                                         auto server = reinterpret_cast<decltype(this)>(priv_data);
+                                     [](int fd, int event, void* private_data) {
+                                         auto server = reinterpret_cast<Server*>(private_data);
                                          server->notice_cb(fd, event);
                                      }
             , this);
@@ -31,8 +32,8 @@ int Server::init() {
 
     // create timer
     _cron_watcher = new TimerWatcher(
-            [](void* priv_data) {
-                auto server = reinterpret_cast<decltype(this)>(priv_data);
+            [](void* private_data) {
+                auto server = reinterpret_cast<Server*>(private_data);
                 server->cron_cb();
             }, this
     );
@@ -68,7 +69,7 @@ int Server::notify(caf::atom_value && msg) {
         return SUCCESS;
     } else {
         LOG_ERROR_DETAIL("notify failed, errno: {}", errno);
-        return FAILED;
+        return FAIL;
     }
 }
 

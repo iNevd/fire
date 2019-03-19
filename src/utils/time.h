@@ -8,7 +8,7 @@
 
 #include <chrono>
 
-namespace fire {
+namespace FIRE {
     inline unsigned long unixMilliseconds() {
         return std::chrono::system_clock::now().time_since_epoch() /
                std::chrono::milliseconds(1);

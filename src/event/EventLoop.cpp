@@ -7,6 +7,7 @@
 #include <event/watcher/IOWatcher.h>
 #include "EventLoop.h"
 
+using namespace FIRE;
 EventLoop * EventLoop::_default_loop = nullptr;
 
 EventLoop::EventLoop(bool use_default, void *el_owner) {

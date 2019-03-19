@@ -6,6 +6,8 @@
 #include "core/Connection.h"
 #include "zmalloc.h"
 #include "utils/util.h"
+
+using namespace FIRE;
 Connection::Connection(int client_fd, void* owner)
     : _fd(client_fd), _owner(owner)
 {

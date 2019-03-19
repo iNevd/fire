@@ -10,8 +10,8 @@
 #include <sys/fcntl.h>
 #include "network.h"
 #include "log.h"
-
-namespace network {
+#include "common/include.h"
+namespace FIRE {
 
     int create_tcp_server(std::string host, int port)  {
         int s, on;
@@ -19,12 +19,12 @@ namespace network {
 
         if ((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
             LOG_WARN_DETAIL("creating socket: {}", strerror(errno));
-            return network::FAILED;
+            return FAIL;
         }
 
         if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1) {
             LOG_WARN_DETAIL("setsockopt SO_REUSEADDR: {}", strerror(errno));
-            return network::FAILED;
+            return FAIL;
         }
 
         //memset(&sa,0,sizeof(sa));
@@ -34,13 +34,13 @@ namespace network {
         if (host.length() <= 0 && inet_aton(host.c_str(), &sa.sin_addr) == 0) {
             LOG_WARN_DETAIL("invalid bind address");
             close(s);
-            return network::FAILED;
+            return FAIL;
         }
 
         if (bind(s,(struct sockaddr*)&sa,sizeof(sa)) == -1) {
             LOG_WARN_DETAIL("bind: {}", strerror(errno));
             close(s);
-            return network::FAILED;
+            return FAIL;
         }
 
         /* Use a backlog of 512 entries. We pass 511 to the listen() call because
@@ -50,7 +50,7 @@ namespace network {
             LOG_WARN_DETAIL("listen: {}", strerror(errno));
             //log_warning("listen: %s", strerror(errno));
             close(s);
-            return network::FAILED;
+            return FAIL;
         }
         return s;
     }
@@ -59,9 +59,9 @@ namespace network {
         int fd = 0;
         struct sockaddr_in sa;
         socklen_t salen = sizeof(sa);
-        if ((fd = generic_accept(s,(struct sockaddr*)&sa,&salen)) == network::FAILED) {
+        if ((fd = generic_accept(s,(struct sockaddr*)&sa,&salen)) == FAIL) {
             LOG_WARN_DETAIL("generic_accept failed");
-            return network::FAILED;
+            return FAIL;
         }
         if (ip) strcpy(ip,inet_ntoa(sa.sin_addr));
         if (port) *port = ntohs(sa.sin_port);
@@ -72,9 +72,9 @@ namespace network {
         int yes = 1;
         if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes)) == -1) {
             LOG_WARN_DETAIL("setsockopt TCP_NODELAY: {}", strerror(errno));
-            return network::FAILED;
+            return FAIL;
         }
-        return network::SUCCESS;
+        return FIRE::SUCCESS;
     }
 
     int set_sock_noblock(int fd)
@@ -86,13 +86,13 @@ namespace network {
          * interrupted by a signal. */
         if ((flags = fcntl(fd, F_GETFL)) == -1) {
             LOG_WARN_DETAIL("fcntl(F_GETFL): {}", strerror(errno));
-            return network::FAILED;
+            return FAIL;
         }
         if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
             LOG_WARN_DETAIL("fcntl(F_SETFL, O_NONBLOCK): {}", strerror(errno));
-            return network::FAILED;
+            return FAIL;
         }
-        return network::SUCCESS;
+        return FIRE::SUCCESS;
     }
 
     int get_sock_ip_port(int fd, std::string &ip, int &port) {
@@ -103,11 +103,11 @@ namespace network {
             port = 0;
             ip = "?";
             LOG_WARN_DETAIL("getpeername failed, fd: {}", fd);
-            return network::FAILED;
+            return FAIL;
         }
         ip = inet_ntoa(sa.sin_addr);
         port = ntohs(sa.sin_port);
-        return network::SUCCESS;
+        return FIRE::SUCCESS;
     }
 
 
@@ -120,7 +120,7 @@ namespace network {
                     continue;
                 else {
                     LOG_WARN_DETAIL("accept: {}", strerror(errno));
-                    return network::FAILED;
+                    return FAIL;
                 }
             }
             break;
@@ -136,11 +136,11 @@ namespace network {
                 nread = 0;
             else {
                 LOG_WARN_DETAIL("read: {}", strerror(errno));
-                return network::FAILED;
+                return FAIL;
             }
         } else if (nread == 0) {
             LOG_WARN_DETAIL("connection closed");
-            return network::FAILED;
+            return FAIL;
         }
         return nread;
     }
@@ -152,7 +152,7 @@ namespace network {
                 nwritten = 0;
             else {
                 LOG_WARN_DETAIL("write: {}", strerror(errno));
-                return network::FAILED;
+                return FAIL;
             }
         }
         return nwritten;

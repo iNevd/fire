@@ -10,6 +10,9 @@
 #include "utils/log.h"
 #include "utils/util.h"
 #include "ServerWorker.h"
+#include "common/include.h"
+
+using namespace FIRE;
 
 ServerWorker::ServerWorker()
     : Server(false)
@@ -96,11 +99,11 @@ void ServerWorker::notice_cb_new_connection(int fd) {
         LOG_WARN_DETAIL("new connection, fd=0");
         return;
     }
-    network::set_sock_noblock(fd);
-    network::set_sock_nodelay(fd);
+    FIRE::set_sock_noblock(fd);
+    FIRE::set_sock_nodelay(fd);
     auto c = new Connection(fd, this);
-    network::get_sock_ip_port(fd, c->_ip, c->_port);
-    c->_last_interaction = fire::mnow();
+    FIRE::get_sock_ip_port(fd, c->_ip, c->_port);
+    c->_last_interaction = FIRE::mnow();
     c->_begin_interaction = c->_last_interaction;
 
     /* create io event and timeout for the connection */
@@ -108,7 +111,7 @@ void ServerWorker::notice_cb_new_connection(int fd) {
             [](int fd, int event, void* priv_data) {
                 UNUSED(fd);
                 auto c = reinterpret_cast<Connection*>(priv_data);
-                auto worker = reinterpret_cast<decltype(this)>(c->_owner);
+                auto worker = reinterpret_cast<ServerWorker*>(c->_owner);
                 worker->conn_io_cb(c, event);
             }
             , c);
@@ -117,7 +120,7 @@ void ServerWorker::notice_cb_new_connection(int fd) {
     c->_timer_watcher = new TimerWatcher(
             [](void *priv_data) {
                 auto c = reinterpret_cast<Connection*>(priv_data);
-                auto worker = reinterpret_cast<decltype(this)>(c->_owner);
+                auto worker = reinterpret_cast<ServerWorker*>(c->_owner);
                 worker->conn_timer_cb(c);
             }
             ,c
@@ -136,14 +139,14 @@ void ServerWorker::notice_cb_new_connection(int fd) {
 void ServerWorker::conn_io_cb_read(Connection *c) {
     LOG_TRACE("Process client fd:{} read", c->_fd);
     c->_readbuf = sdsMakeRoomFor(c->_readbuf, 128);
-    auto nread = network::sock_read(c->_fd, c->_readbuf, 128);
+    auto nread = FIRE::sock_read(c->_fd, c->_readbuf, 128);
 
-    if(nread == network::FAILED) {
+    if(nread == FAIL) {
         LOG_WARN_DETAIL("Process client fd:{} read failed! errno: {}", c->_fd, errno);
         return;
     }
 
-    c->_last_interaction = fire::mnow();
+    c->_last_interaction = FIRE::mnow();
     // TODO test
     std::cout << "read: " << c->_readbuf << std::endl;
 
@@ -156,7 +159,7 @@ void ServerWorker::conn_io_cb_read(Connection *c) {
 //    } else if (nread > 0) {
 //        sdsIncrLen(c->_readbuf, nread);
 //    }
-    c->_last_interaction = fire::mnow();
+    c->_last_interaction = FIRE::mnow();
 
 //    int ret = process_read_query(c);
 //    if (ret == WORKER_ERROR) {
@@ -175,9 +178,9 @@ void ServerWorker::conn_io_cb_write(Connection *c) {
     auto& reply_list = c->_reply_list;
     while(!reply_list.empty()) {
         auto reply = reply_list.front();
-        auto nwrite = network::sock_write(c->_fd, reply.data() + c->_cur_resp_pos, reply.size() - c->_cur_resp_pos);
+        auto nwrite = FIRE::sock_write(c->_fd, reply.data() + c->_cur_resp_pos, reply.size() - c->_cur_resp_pos);
         //std::cout << "write: " << reply.data() + c->_cur_resp_pos << std::endl;
-        if(nwrite == network::FAILED) {
+        if(nwrite == FAIL) {
             LOG_WARN_DETAIL("Process client fd:{} write failed! errno: {}", c->_fd, errno);
             return;
         }else if(nwrite == 0) {
@@ -193,7 +196,7 @@ void ServerWorker::conn_io_cb_write(Connection *c) {
         }
 
     }
-    c->_last_interaction = fire::mnow();
+    c->_last_interaction = FIRE::mnow();
     if(c->_reply_list.empty()) {
         _eventLoop.stop_watcher(c->_tcp_io_watcher, IOWatcher::WRITE);
     }
@@ -203,7 +206,7 @@ void ServerWorker::conn_io_cb_write(Connection *c) {
 void ServerWorker::conn_timer_cb(Connection *c) {
     LOG_TRACE("Process client fd:{} timer event", c->_fd);
 
-    if(fire::mnow() - c->_last_interaction > 1000) {
+    if(FIRE::mnow() - c->_last_interaction > 1000) {
         close_connection(c);
     }
 }

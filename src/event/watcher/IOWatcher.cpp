@@ -6,16 +6,17 @@
 #include "IOWatcher.h"
 #include "utils/util.h"
 
-IOWatcher::IOWatcher(int fd, int event, IOWatcher::io_cb_t cb, void *priv_data)
-    : _fd(fd), _events(event), _cb(cb), _priv_data(priv_data)
+using namespace FIRE;
+IOWatcher::IOWatcher(int fd, int event, IOWatcher::io_cb_t cb, void *private_data)
+    : _fd(fd), _events(event), _cb(cb), _private_data(private_data)
 {
     _io.data = this;
 
     ev_init(&_io,
             [](struct ev_loop *loop, struct ev_io *io, int event) {
                 UNUSED(loop);
-                auto watcher = reinterpret_cast<decltype(this)>(io->data);
-                watcher->_cb(io->fd, event, watcher->_priv_data);
+                auto watcher = reinterpret_cast<IOWatcher*>(io->data);
+                watcher->_cb(io->fd, event, watcher->_private_data);
             }
     );
 }
