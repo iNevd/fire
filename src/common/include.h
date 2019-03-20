@@ -9,8 +9,8 @@ namespace FIRE
 {
     enum : int
     {
-        FAIL = -1,
-        SUCCESS = 0
+        FAILED = -1,
+        SUCCEEDED = 0
     };
 }
 

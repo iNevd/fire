@@ -19,7 +19,7 @@ void signal_process(int sig) {
 }
 
 int main() {
-    init_log();
+    FIRE::init_log();
     signal(SIGPIPE, SIG_IGN);
     signal(SIGTERM, signal_process);
     FIRE::ServerMain::getInstance()->init();

@@ -18,13 +18,13 @@ int Server::init() {
     int fds[2] = {0};
     if (pipe(fds)) {
         LOG_ERROR_DETAIL("create pipe failed");
-        return FAIL;
+        return FAILED;
     }
     _notice_recv_fd = fds[0];
     _notice_send_fd = fds[1];
     _notify_watcher = new IOWatcher(_notice_recv_fd, IOWatcher::READ,
                                      [](int fd, int event, void* private_data) {
-                                         auto server = reinterpret_cast<Server*>(private_data);
+                                         auto server = reinterpret_cast<decltype(this)>(private_data);
                                          server->notice_cb(fd, event);
                                      }
             , this);
@@ -33,7 +33,7 @@ int Server::init() {
     // create timer
     _cron_watcher = new TimerWatcher(
             [](void* private_data) {
-                auto server = reinterpret_cast<Server*>(private_data);
+                auto server = reinterpret_cast<decltype(this)>(private_data);
                 server->cron_cb();
             }, this
     );
@@ -44,7 +44,7 @@ int Server::init() {
     //    timer_watcher->set_repeat(true);
     //    _eventLoop.start_watcher(timer_watcher);
     //_eventLoop.start_watcher(_cron_watcher);
-    return SUCCESS;
+    return SUCCEEDED;
 
 }
 
@@ -66,10 +66,10 @@ void Server::stop() {
 int Server::notify(caf::atom_value && msg) {
     LOG_DEBUG_DETAIL("notify fd: {}  msg: {}", _notice_recv_fd, static_cast<uint64_t >(msg));
     if(write(_notice_send_fd, &msg, sizeof(caf::atom_value)) == sizeof(caf::atom_value)) {
-        return SUCCESS;
+        return SUCCEEDED;
     } else {
         LOG_ERROR_DETAIL("notify failed, errno: {}", errno);
-        return FAIL;
+        return FAILED;
     }
 }
 
