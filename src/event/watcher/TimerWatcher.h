@@ -15,9 +15,11 @@ namespace FIRE
         static const Event NONE = EVENT_NONE;
     public:
         using timer_cb_t = std::function<void(void* private_data)>;
+
         TimerWatcher() = delete;
         TimerWatcher(timer_cb_t cb, void* private_data = nullptr, bool repeat = false);
     public:
+        void start_event(struct ev_loop *, Event event, bool repeat);
         void start_event(struct ev_loop *, Event event = NONE) override;
         void stop_event(struct ev_loop *, Event event = NONE) override;
         inline void set_usec(unsigned long _usec);
@@ -30,6 +32,7 @@ namespace FIRE
         unsigned long _usec = 0;        // usec/1000000.0 timer
         timer_cb_t _cb = nullptr;
         bool _repeat = false;
+        // 私有数据, 外部负责其生命周期
         void* _private_data = nullptr;
     };
 }

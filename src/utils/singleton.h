@@ -20,5 +20,18 @@ protected:
     Singleton() = default;
 };
 
+/*
+ * Apple LLVM version 10.0.0 (clang-1000.10.44.4)
+ * build ok
+ */
+/*
+ * gcc version 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC)
+ * error: use of deleted function ‘Class(Class&&)’
+ */
+/*
+ * gcc (GCC) 8.3.0
+ * error: use of deleted function ‘Class(Class&&)’
+ */
+
 
 #endif //CPP_SINGLETON_H

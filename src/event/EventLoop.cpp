@@ -17,17 +17,18 @@ EventLoop::EventLoop(bool use_default, void *el_owner) {
     if (use_default) {
         _loop = EV_DEFAULT;
         _default_loop = this;
-        //log_debug("init default event loop");
     } else {
         _loop = ev_loop_new(EVFLAG_AUTO);
-        //log_debug("init event loop");
     }
     ev_set_userdata(_loop, reinterpret_cast<void*>(this));
 }
 
 
 EventLoop::~EventLoop() {
-
+    if(_loop) {
+        ev_loop_destroy(_loop);
+        _loop = nullptr;
+    }
 }
 
 void EventLoop::run() {

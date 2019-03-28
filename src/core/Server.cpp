@@ -12,6 +12,14 @@ using namespace FIRE;
 
 Server::Server(bool useDefaultEvLoop) : _eventLoop(useDefaultEvLoop, this) { }
 
+Server::~Server() {
+    if(_notify_watcher) {
+        delete _notify_watcher;
+    }
+    if(_cron_watcher) {
+        delete _cron_watcher;
+    }
+}
 
 int Server::init() {
     // create pipe

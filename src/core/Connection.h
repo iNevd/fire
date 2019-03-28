@@ -21,34 +21,35 @@ namespace FIRE
 
 
     public:
-        // fd, from accept
+        // fd, from accept 4
         int _fd = 0;
 
-        // client ip string
-        std::string _ip;
-
-        // client port
+        // client port 4
         int _port = 0;
 
-        // this's owner (a worker's pointer)
-        void* _owner = nullptr;
-
-        // read buffer
+        // read buffer 8
         sds _readbuf = nullptr;
 
-        // write buffer
-        std::list<leveldb::Slice> _reply_list;
-        std::list<leveldb::Slice>::size_type _reply_list_size = 0;
-        size_t _cur_resp_pos = 0;
+        // this's owner (a worker's pointer) 8
+        void* _owner = nullptr;
 
-        // io & timer info
+        // io & timer info 8*2
         IWatcher *_tcp_io_watcher;
         IWatcher *_timer_watcher;
 
-        // timeout control
+        // timeout control 8*3
         unsigned long _begin_interaction = 0;
         unsigned long _last_interaction = 0;
         unsigned long _connection_timeout = 0;
+
+        // write buffer 24
+        std::list<leveldb::Slice> _reply_list;
+        // 24
+        std::list<leveldb::Slice>::size_type _reply_list_size = 0;
+        size_t _cur_resp_pos = 0;
+
+        // client ip string  24Byte
+        std::string _ip;
     };
 }
 

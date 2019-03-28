@@ -28,13 +28,17 @@ namespace FIRE
         void stop_event(struct ev_loop *, Event event = NONE) override;
 
     public:
-        int get_fd() const;
+        inline int get_fd() const;
+        inline int get_events() const;
 
     private:
-        int _fd = 0;
-        Event _events = NONE;
+        // 私有回调函数
         io_cb_t _cb;
+
+        // 私有数据, 外部负责其生命周期
         void* _private_data = nullptr;
+
+        // 框架内部的IO结构体
         struct ev_io _io;
     };
 

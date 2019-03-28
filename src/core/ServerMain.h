@@ -14,7 +14,6 @@
 namespace FIRE
 {
 class ServerMain : public Server, public Singleton<ServerMain>{
-        // for Singleton<ServerMain>
         friend SingletonDerived;
     public:
         int init() override;

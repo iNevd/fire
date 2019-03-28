@@ -3,7 +3,7 @@ project(fire)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "--pipe -W -Wextra -Wall -fPIC -finline-functions -Werror -g")
+set(CMAKE_CXX_FLAGS "--pipe -W -Wextra -Wall -fPIC -finline-functions -Werror -g -Wno-c++17-compat-mangling")
 
 set(SOURCE_FILES src/main.cpp src/utils/singleton.h src/common/include.h)
 

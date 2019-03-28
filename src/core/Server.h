@@ -21,7 +21,7 @@ namespace FIRE
     public:
         Server() = delete;
         Server(bool useDefaultEvLoop);
-
+        virtual ~Server();
         virtual int init();
         virtual void run();
         virtual void stop();

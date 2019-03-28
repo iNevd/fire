@@ -15,7 +15,7 @@ TimerWatcher::TimerWatcher(TimerWatcher::timer_cb_t cb, void* private_data, bool
             [](struct ev_loop *loop, struct ev_timer *timer, int event) {
                 UNUSED(loop);
                 UNUSED(event);
-                auto watcher = reinterpret_cast<TimerWatcher*>(timer->data);
+                auto watcher = reinterpret_cast<decltype(this)>(timer->data);
                 watcher->_cb(watcher->_private_data);
             }
     );
@@ -37,6 +37,12 @@ void TimerWatcher::start_event(struct ev_loop *loop, Event usec) {
     }
 }
 
+void TimerWatcher::start_event(struct ev_loop *loop, Event event, bool repeat) {
+    set_repeat(repeat);
+    start_event(loop, event);
+}
+
+
 
 void TimerWatcher::stop_event(struct ev_loop *loop, Event unused) {
     UNUSED(unused);
@@ -45,9 +51,9 @@ void TimerWatcher::stop_event(struct ev_loop *loop, Event unused) {
 
 
 
-void TimerWatcher::set_usec(unsigned long _usec) {
-    if(_usec > NONE) {
-        TimerWatcher::_usec = _usec;
+void TimerWatcher::set_usec(unsigned long usec) {
+    if(usec > NONE) {
+        this->_usec = usec;
     }
 }
 
@@ -55,11 +61,12 @@ unsigned long TimerWatcher::get_usec() const {
     return _usec;
 }
 
-void TimerWatcher::set_repeat(bool _repeat) {
-    TimerWatcher::_repeat = _repeat;
+void TimerWatcher::set_repeat(bool repeat) {
+    this->_repeat = repeat;
 }
 
 bool TimerWatcher::is_repeat() const {
     return _repeat;
 }
+
 
