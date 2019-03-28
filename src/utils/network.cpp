@@ -19,12 +19,12 @@ namespace FIRE {
 
         if ((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
             LOG_WARN_DETAIL("creating socket: {}", strerror(errno));
-            return FAIL;
+            return FAILED;
         }
 
         if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1) {
             LOG_WARN_DETAIL("setsockopt SO_REUSEADDR: {}", strerror(errno));
-            return FAIL;
+            return FAILED;
         }
 
         //memset(&sa,0,sizeof(sa));
@@ -34,13 +34,13 @@ namespace FIRE {
         if (host.length() <= 0 && inet_aton(host.c_str(), &sa.sin_addr) == 0) {
             LOG_WARN_DETAIL("invalid bind address");
             close(s);
-            return FAIL;
+            return FAILED;
         }
 
         if (bind(s,(struct sockaddr*)&sa,sizeof(sa)) == -1) {
             LOG_WARN_DETAIL("bind: {}", strerror(errno));
             close(s);
-            return FAIL;
+            return FAILED;
         }
 
         /* Use a backlog of 512 entries. We pass 511 to the listen() call because
@@ -50,7 +50,7 @@ namespace FIRE {
             LOG_WARN_DETAIL("listen: {}", strerror(errno));
             //log_warning("listen: %s", strerror(errno));
             close(s);
-            return FAIL;
+            return FAILED;
         }
         return s;
     }
@@ -59,9 +59,9 @@ namespace FIRE {
         int fd = 0;
         struct sockaddr_in sa;
         socklen_t salen = sizeof(sa);
-        if ((fd = generic_accept(s,(struct sockaddr*)&sa,&salen)) == FAIL) {
+        if ((fd = generic_accept(s,(struct sockaddr*)&sa,&salen)) == FAILED) {
             LOG_WARN_DETAIL("generic_accept failed");
-            return FAIL;
+            return FAILED;
         }
         if (ip) strcpy(ip,inet_ntoa(sa.sin_addr));
         if (port) *port = ntohs(sa.sin_port);
@@ -72,9 +72,9 @@ namespace FIRE {
         int yes = 1;
         if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes)) == -1) {
             LOG_WARN_DETAIL("setsockopt TCP_NODELAY: {}", strerror(errno));
-            return FAIL;
+            return FAILED;
         }
-        return FIRE::SUCCESS;
+        return FIRE::SUCCEEDED;
     }
 
     int set_sock_noblock(int fd)
@@ -86,13 +86,13 @@ namespace FIRE {
          * interrupted by a signal. */
         if ((flags = fcntl(fd, F_GETFL)) == -1) {
             LOG_WARN_DETAIL("fcntl(F_GETFL): {}", strerror(errno));
-            return FAIL;
+            return FAILED;
         }
         if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
             LOG_WARN_DETAIL("fcntl(F_SETFL, O_NONBLOCK): {}", strerror(errno));
-            return FAIL;
+            return FAILED;
         }
-        return FIRE::SUCCESS;
+        return FIRE::SUCCEEDED;
     }
 
     int get_sock_ip_port(int fd, std::string &ip, int &port) {
@@ -103,11 +103,11 @@ namespace FIRE {
             port = 0;
             ip = "?";
             LOG_WARN_DETAIL("getpeername failed, fd: {}", fd);
-            return FAIL;
+            return FAILED;
         }
         ip = inet_ntoa(sa.sin_addr);
         port = ntohs(sa.sin_port);
-        return FIRE::SUCCESS;
+        return FIRE::SUCCEEDED;
     }
 
 
@@ -120,7 +120,7 @@ namespace FIRE {
                     continue;
                 else {
                     LOG_WARN_DETAIL("accept: {}", strerror(errno));
-                    return FAIL;
+                    return FAILED;
                 }
             }
             break;
@@ -136,11 +136,11 @@ namespace FIRE {
                 nread = 0;
             else {
                 LOG_WARN_DETAIL("read: {}", strerror(errno));
-                return FAIL;
+                return FAILED;
             }
         } else if (nread == 0) {
             LOG_WARN_DETAIL("connection closed");
-            return FAIL;
+            return FAILED;
         }
         return nread;
     }
@@ -152,7 +152,7 @@ namespace FIRE {
                 nwritten = 0;
             else {
                 LOG_WARN_DETAIL("write: {}", strerror(errno));
-                return FAIL;
+                return FAILED;
             }
         }
         return nwritten;

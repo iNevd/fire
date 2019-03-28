@@ -24,15 +24,15 @@ int ServerMain::init() {
 
     // listen
     _listen_fd = FIRE::create_tcp_server("127.0.0.1", 8888);
-    if(_listen_fd == FAIL) {
+    if(_listen_fd == FAILED) {
         LOG_ERROR_DETAIL("listen failed, ip {}, port {}", "127.0.0.1", 8888);
-        return FAIL;
+        return FAILED;
     }
 
     // watch fd
     _tcp_conn_watcher = new IOWatcher(_listen_fd, IOWatcher::READ,
-            [](int fd, int event, void* priv_data) {
-                auto server = reinterpret_cast<ServerMain*>(priv_data);
+            [](int fd, int event, void* private_data) {
+                auto server = reinterpret_cast<decltype(this)>(private_data);
                 server->tcp_conn_cb(fd, event);
             }
             , this);
@@ -50,7 +50,7 @@ int ServerMain::init() {
         it->init();
         it->thread_run();
     }
-    return SUCCESS;
+    return SUCCEEDED;
 }
 
 void ServerMain::stop() {
@@ -95,7 +95,7 @@ void ServerMain::tcp_conn_cb(int fd, int event) {
     char cip[128] = {};
 
     cfd = FIRE::tcp_accept(fd, cip, &cport);
-    if (cfd == FAIL) {
+    if (cfd == FAILED) {
         LOG_WARN_DETAIL("tcp accept failed! error: {}", errno);
         return;
     }
@@ -103,7 +103,7 @@ void ServerMain::tcp_conn_cb(int fd, int event) {
     auto worker = _workers[_next_worker];
     _next_worker = (_next_worker+1)%_workers.size();
     worker->enqueue(cfd);
-    if (worker->notify(caf::atom("NewConnect")) != SUCCESS) {
+    if (worker->notify(caf::atom("NewConnect")) != SUCCEEDED) {
         LOG_WARN_DETAIL("notify worker NewConnect failed!");
         return;
     }

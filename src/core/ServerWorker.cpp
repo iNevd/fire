@@ -108,10 +108,10 @@ void ServerWorker::notice_cb_new_connection(int fd) {
 
     /* create io event and timeout for the connection */
     c->_tcp_io_watcher =  new IOWatcher(c->_fd, IOWatcher::READ,
-            [](int fd, int event, void* priv_data) {
+            [](int fd, int event, void* private_data) {
                 UNUSED(fd);
-                auto c = reinterpret_cast<Connection*>(priv_data);
-                auto worker = reinterpret_cast<ServerWorker*>(c->_owner);
+                auto c = reinterpret_cast<Connection*>(private_data);
+                auto worker = reinterpret_cast<decltype(this)>(c->_owner);
                 worker->conn_io_cb(c, event);
             }
             , c);
@@ -120,7 +120,7 @@ void ServerWorker::notice_cb_new_connection(int fd) {
     c->_timer_watcher = new TimerWatcher(
             [](void *priv_data) {
                 auto c = reinterpret_cast<Connection*>(priv_data);
-                auto worker = reinterpret_cast<ServerWorker*>(c->_owner);
+                auto worker = reinterpret_cast<decltype(this)>(c->_owner);
                 worker->conn_timer_cb(c);
             }
             ,c
@@ -141,7 +141,7 @@ void ServerWorker::conn_io_cb_read(Connection *c) {
     c->_readbuf = sdsMakeRoomFor(c->_readbuf, 128);
     auto nread = FIRE::sock_read(c->_fd, c->_readbuf, 128);
 
-    if(nread == FAIL) {
+    if(nread == FAILED) {
         LOG_WARN_DETAIL("Process client fd:{} read failed! errno: {}", c->_fd, errno);
         return;
     }
@@ -179,8 +179,7 @@ void ServerWorker::conn_io_cb_write(Connection *c) {
     while(!reply_list.empty()) {
         auto reply = reply_list.front();
         auto nwrite = FIRE::sock_write(c->_fd, reply.data() + c->_cur_resp_pos, reply.size() - c->_cur_resp_pos);
-        //std::cout << "write: " << reply.data() + c->_cur_resp_pos << std::endl;
-        if(nwrite == FAIL) {
+        if(nwrite == FAILED) {
             LOG_WARN_DETAIL("Process client fd:{} write failed! errno: {}", c->_fd, errno);
             return;
         }else if(nwrite == 0) {

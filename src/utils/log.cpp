@@ -5,9 +5,12 @@
 
 #include "log.h"
 
-std::shared_ptr<spdlog::logger> _main_logger = spdlog::stdout_color_mt("main");
+using namespace FIRE;
 
-int init_log() {
+std::shared_ptr<spdlog::logger> FIRE::_main_logger = spdlog::stdout_color_mt("main");
+
+int FIRE::init_log() {
+    // TODO loglevel options
     _main_logger->set_level(spdlog::level::trace);
     return 0;
 }
