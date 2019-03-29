@@ -1,28 +1,23 @@
 #include <iostream>
 #include <core/ServerMain.h>
 #include <csignal>
+#include "utils/signal_process.h"
 #include "utils/log.h"
 
 
-void signal_process(int sig) {
-    if (sig == SIGTERM) {
-        LOG_WARN("safe kill signal catched");
-        FIRE::ServerMain::getInstance()->stop();
-
-        LOG_TRACE("all server stoped");
-        usleep(10 * 1000); /* waiting for log thread */
-        exit(sig);
-    } else{
-        LOG_WARN("unexpected signal catched. ignore it.", sig);
-        return;
-    }
-}
 
 int main() {
+    // 0. 日志初始化
     FIRE::init_log();
-    signal(SIGPIPE, SIG_IGN);
-    signal(SIGTERM, signal_process);
+
+    // 1. 初始化信号处理
+    FIRE::signal_ignore(SIGPIPE);
+    FIRE::signal_process(SIGTERM);
+
+    // 2. 初始化主逻辑
     FIRE::ServerMain::getInstance()->init();
+
+    // 3. 开始跑
     FIRE::ServerMain::getInstance()->run();
     return 0;
 }
