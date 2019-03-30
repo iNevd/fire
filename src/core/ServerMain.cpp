@@ -57,6 +57,11 @@ void ServerMain::stop() {
     LOG_TRACE("Stop ServerMain");
     Server::stop();
 
+    if(_tcp_conn_watcher) {
+        delete _tcp_conn_watcher;
+        _tcp_conn_watcher = nullptr;
+    }
+
     if(_listen_fd != 0) {
         close(_listen_fd);
         _listen_fd = 0;
@@ -65,7 +70,11 @@ void ServerMain::stop() {
     for(auto it : _workers) {
         it->notify(caf::atom("Quit"));
         it->join();
+        delete it;
+        it = nullptr;
     }
+
+    _workers.clear();
 }
 
 void ServerMain::notice_cb(int fd, int event) {
@@ -107,4 +116,8 @@ void ServerMain::tcp_conn_cb(int fd, int event) {
         LOG_WARN_DETAIL("notify worker NewConnect failed!");
         return;
     }
+}
+
+ServerMain::~ServerMain() {
+    stop();
 }

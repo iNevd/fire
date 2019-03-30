@@ -32,7 +32,6 @@ namespace FIRE
         void stop_watcher(IWatcher* watcher, Event event = EVENT_NONE);
         void delete_watcher(IWatcher*& watcher, Event event = EVENT_NONE);
 
-
     private:
         /* reference to owner of the EventLoop */
         void* _owner = nullptr;

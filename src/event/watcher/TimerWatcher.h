@@ -17,21 +17,14 @@ namespace FIRE
         using timer_cb_t = std::function<void(void* private_data)>;
 
         TimerWatcher() = delete;
-        TimerWatcher(timer_cb_t cb, void* private_data = nullptr, bool repeat = false);
+        TimerWatcher(timer_cb_t cb, void* private_data = nullptr, Event usec = 0, double repeat = .0);
     public:
-        void start_event(struct ev_loop *, Event event, bool repeat);
         void start_event(struct ev_loop *, Event event = NONE) override;
         void stop_event(struct ev_loop *, Event event = NONE) override;
-        inline void set_usec(unsigned long _usec);
-        inline unsigned long get_usec() const;
-        void set_repeat(bool _repeat);
-        bool is_repeat() const;
-
+        void set_repeat(struct ev_loop*, double repeat);
     private:
         struct ev_timer _timer;
-        unsigned long _usec = 0;        // usec/1000000.0 timer
         timer_cb_t _cb = nullptr;
-        bool _repeat = false;
         // 私有数据, 外部负责其生命周期
         void* _private_data = nullptr;
     };

@@ -5,6 +5,7 @@
 #ifndef FIRE_SIGNAL_PROCESS_H
 #define FIRE_SIGNAL_PROCESS_H
 
+#include "utils/log.h"
 namespace FIRE {
     void _signal_process(int sig) {
         if (sig == SIGTERM) {

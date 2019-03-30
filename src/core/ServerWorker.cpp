@@ -57,9 +57,9 @@ void ServerWorker::stop() {
         _eventLoop.delete_watcher(it->_timer_watcher);
         _eventLoop.delete_watcher(it->_tcp_io_watcher);
         delete it;
+        it = nullptr;
     }
     _connections.clear();
-
     if(_t != nullptr) {
         delete _t;
         _t = nullptr;
@@ -119,14 +119,14 @@ void ServerWorker::notice_cb_new_connection(int fd) {
 
     c->_timer_watcher = new TimerWatcher(
             [](void *priv_data) {
-                auto c = reinterpret_cast<Connection*>(priv_data);
+                auto c = reinterpret_cast<Connection *>(priv_data);
                 auto worker = reinterpret_cast<decltype(this)>(c->_owner);
                 worker->conn_timer_cb(c);
-            }
-            ,c
+            },
+            c,
+            100 * 1000,
+            1.0
     );
-    auto timer_watcher = dynamic_cast<TimerWatcher*>(c->_timer_watcher);
-    timer_watcher->set_repeat(true);
 
     _eventLoop.start_watcher(c->_timer_watcher, 100 * 1000);
 
@@ -151,26 +151,6 @@ void ServerWorker::conn_io_cb_read(Connection *c) {
     std::cout << "read: " << c->_readbuf << std::endl;
 
     return;
-//    nread = Network::sock_read(fd, c->_readbuf+qblen, readlen);
-//    if (nread == NET_ERROR) {
-//        //log_debug("sock_read_data: return error, close connection");
-//        //close_conn(c);
-//        return;
-//    } else if (nread > 0) {
-//        sdsIncrLen(c->_readbuf, nread);
-//    }
-    c->_last_interaction = FIRE::mnow();
-
-//    int ret = process_read_query(c);
-//    if (ret == WORKER_ERROR) {
-//        //log_debug("process_read_query: return error, close connection");
-//        close_conn(c);
-//        return;
-//    } else if (ret == WORKER_CONNECTION_REMOVED) {
-//        return;
-//    }
-
-
 }
 
 void ServerWorker::conn_io_cb_write(Connection *c) {
@@ -233,4 +213,8 @@ void ServerWorker::close_connection(Connection *c) {
 void ServerWorker::run() {
     LOG_TRACE("Run ServerWorker! (thread)");
     Server::run();
+}
+
+ServerWorker::~ServerWorker() {
+    stop();
 }

@@ -19,7 +19,7 @@ namespace FIRE
     class ServerWorker : public Server{
     public:
         ServerWorker();
-
+        ~ServerWorker();
         void thread_run();
         void join();
 

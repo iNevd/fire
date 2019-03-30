@@ -10,8 +10,8 @@
 
 namespace FIRE
 {
-    using Event = int;
-    static const Event EVENT_NONE = 0;
+    using Event = long;
+    static const Event EVENT_NONE = .0;
 
     class IWatcher {
 

@@ -21,4 +21,16 @@ Connection::~Connection() {
     for(auto it : _reply_list) {
         zfree(const_cast<char*>(it.data()));
     }
+
+    _reply_list.clear();
+
+    if(_tcp_io_watcher) {
+        delete _tcp_io_watcher;
+        _tcp_io_watcher = nullptr;
+    }
+
+    if(_timer_watcher) {
+        delete _timer_watcher;
+        _timer_watcher = nullptr;
+    }
 }
