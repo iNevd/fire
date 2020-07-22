@@ -9,7 +9,7 @@
 #include <vector>
 #include "Server.h"
 #include "ServerWorker.h"
-#include "utils/singleton.h"
+#include "singleton.h"
 
 namespace FIRE
 {

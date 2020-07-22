@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_CXX_FLAGS "--pipe -W -Wextra -Wall -fPIC -finline-functions -Werror -g -Wno-c++17-compat-mangling")
 
-set(SOURCE_FILES src/main.cpp src/utils/singleton.h src/common/include.h)
+set(SOURCE_FILES src/main.cpp src/common/include.h)
 
 include_directories(src)
 
@@ -75,6 +75,20 @@ ExternalProject_Add(atom_val
 
 ExternalProject_Get_Property(atom_val SOURCE_DIR)
 MESSAGE( STATUS "atom_val SOURCE_DIR:        " ${SOURCE_DIR} )
+
+include_directories(${SOURCE_DIR})
+
+
+# import singleton template from github.com
+ExternalProject_Add(singleton
+        GIT_REPOSITORY https://github.com/iNevd/singleton.git
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        )
+
+ExternalProject_Get_Property(singleton SOURCE_DIR)
+MESSAGE( STATUS "singleton SOURCE_DIR:        " ${SOURCE_DIR} )
 
 include_directories(${SOURCE_DIR})
 
@@ -158,6 +172,7 @@ add_dependencies(${PROJECT_NAME} leveldb_slice)
 add_dependencies(${PROJECT_NAME} zmalloc)
 add_dependencies(${PROJECT_NAME} sds)
 add_dependencies(${PROJECT_NAME} spdlog)
+add_dependencies(${PROJECT_NAME} singleton)
 
 # link third lib
 target_link_libraries(${PROJECT_NAME} -lev)

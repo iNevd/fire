@@ -13,7 +13,11 @@
 #include <netdb.h>
 
 namespace FIRE {
-    int create_tcp_server(std::string host, int port);
+    /*
+     * @param host string 字符串形式的IP地址
+     * @param port unsigned short 监听的端口
+     */
+    int create_tcp_server(std::string host, unsigned short port);
     int tcp_accept(int s, char *ip, int *port);
     int generic_accept(int s, struct sockaddr *sa, socklen_t *len);
     int set_sock_noblock(int fd);

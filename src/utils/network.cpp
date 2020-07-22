@@ -13,21 +13,21 @@
 #include "common/include.h"
 namespace FIRE {
 
-    int create_tcp_server(std::string host, int port)  {
-        int s, on;
+    int create_tcp_server(std::string host, unsigned short port)  {
+        int s, on = 1;
         struct sockaddr_in sa = {};
 
         if ((s = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            LOG_WARN_DETAIL("creating socket: {}", strerror(errno));
+            LOG_WARN_DETAIL("create socket: {}", strerror(errno));
             return FAILED;
         }
 
+        // https://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t
         if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1) {
             LOG_WARN_DETAIL("setsockopt SO_REUSEADDR: {}", strerror(errno));
             return FAILED;
         }
 
-        //memset(&sa,0,sizeof(sa));
         sa.sin_family = AF_INET;
         sa.sin_port = htons(port);
         sa.sin_addr.s_addr = htonl(INADDR_ANY);

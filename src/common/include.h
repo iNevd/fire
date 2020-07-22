@@ -1,5 +1,5 @@
 //
-// Created by peter on 3/19/19.
+// Created by iNevd on 3/19/19.
 //
 
 #ifndef FIRE_INCLUDE_H
